@@ -40,7 +40,7 @@
     <main class="p-6 max-w-[1600px] mx-auto space-y-6">
         
         <div id="statusBanner" class="p-4 rounded-lg bg-blue-950/40 border border-blue-800/60 text-blue-300 text-sm flex items-center justify-between">
-            <span id="statusMessage">Initial state: Click 'Sync Live Data' to extract positional sheets from your published link.</span>
+            <span id="statusMessage">Initial state: Click 'Sync Live Data' to extract positional sheets from your new published link.</span>
             <span id="timestamp" class="text-xs text-slate-400">Not synced</span>
         </div>
 
@@ -135,8 +135,8 @@
     </main>
 
     <script>
-        // Clean URL variable holding your published spreadsheet data structure
-        const CLEAN_CSV_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTKoh8d2RaxpwcT9BXtq3bqXQoVQKycqT6MAJ9VEpvqDUQ94JfFYp3QSQJaNucJiAxAOuYm_YZFyzZq/pub?output=csv";
+        // Updated URL string targeting your brand new published spreadsheet asset token
+        const CLEAN_CSV_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTjIMi-osLQjTUoIWI-RDHkzZFqPL1AgZlbv7qZp3B78IcP1i7xeYznxgVX5fcj3q2kTLJlv3JLh1tT/pub?output=csv";
 
         let parsedData = { employeeMaster: [], projectMetrics: [], selfRatings: [], appraiserRatings: [] };
         let masterMatrix = [];
@@ -193,7 +193,6 @@
 
         // Pull loops using cross-origin compliant sequential tracking numbers
         async function fetchSequencedTab(tabIndex, tabLabel) {
-            // Internal Google indexing handles consecutive sheets via incremental integers starting at 0
             const url = tabIndex === 0 ? CLEAN_CSV_BASE : `${CLEAN_CSV_BASE}&gid=${tabIndex}`;
             
             try {
@@ -202,7 +201,7 @@
                 const text = await response.text();
                 return parseCSV(text);
             } catch (e) {
-                // If standard sequential guessing hits an issue due to unique custom GIDs, we fallback to alternate indices
+                // Positional sequence backup array
                 const alternativeGids = [0, 1, 2, 3];
                 const fallbackUrl = `${CLEAN_CSV_BASE}&gid=${alternativeGids[tabIndex] || tabIndex}`;
                 const fallbackResponse = await fetch(fallbackUrl);
@@ -214,11 +213,11 @@
 
         async function refreshAllData() {
             const statusMsg = document.getElementById('statusMessage');
-            statusMsg.innerText = "Bypassing string queries. Synchronizing raw tabular data using strict order matching...";
+            statusMsg.innerText = "Synchronizing raw dataset layers from the new Google Spreadsheet location...";
             statusMsg.className = "text-yellow-400 font-medium";
 
             try {
-                // Fetch sheets based strictly on their physical positions
+                // Fetch sheets based strictly on their physical sequential alignment
                 const empMaster = await fetchSequencedTab(0, "Employee_Master");
                 const projMetrics = await fetchSequencedTab(1, "Project_Metrics");
                 const selfRate = await fetchSequencedTab(2, "Self_Ratings_Data");
@@ -234,13 +233,13 @@
                 renderTable();
                 buildDistributionChart();
 
-                statusMsg.innerText = "All 4 data sheets cleanly synchronized. Cross-sheet data matrix generated.";
+                statusMsg.innerText = "New data source cleanly mapped and processed.";
                 document.getElementById('statusBanner').className = "p-4 rounded-lg bg-emerald-950/40 border border-emerald-800/60 text-emerald-400 text-sm flex items-center justify-between";
                 document.getElementById('timestamp').innerText = new Date().toLocaleTimeString();
 
             } catch (error) {
                 console.error(error);
-                statusMsg.innerText = `Sync failed: ${error.message}. Please verify the spreadsheet remains actively published to the web.`;
+                statusMsg.innerText = `Sync failed: ${error.message}. Confirm the new spreadsheet link is published as 'Entire Document'.`;
                 document.getElementById('statusBanner').className = "p-4 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-400 text-sm flex items-center justify-between";
             }
         }
@@ -250,12 +249,12 @@
                 const empId = emp["Emp ID"] || emp["EmpID"];
                 const project = emp["Project"];
 
-                // Find matching records in the other datasets using clean column references
+                // Locate structural matches across tables safely
                 const projMetric = parsedData.projectMetrics.find(p => p["Project"] === project) || {};
                 const selfScore = parsedData.selfRatings.find(s => (s["Emp ID"] || s["EmpID"]) === empId) || {};
                 const appraiserScore = parsedData.appraiserRatings.find(a => (a["Emp ID"] || a["EmpID"]) === empId) || {};
 
-                // Extract relevant columns safely
+                // Handle string headers and convert numeric types cleanly
                 const complexityFactor = parseFloat(projMetric["Project Complexity Factor"] || projMetric["Project Complexity"]) || 1.0;
                 const appraiserWeighted = parseFloat(appraiserScore["Weighted Score"] || appraiserScore["WeightedScore"]) || 0.0;
                 const selfWeighted = parseFloat(selfScore["Weighted Score"] || selfScore["WeightedScore"]) || 0.0;
