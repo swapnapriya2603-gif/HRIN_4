@@ -13,7 +13,7 @@
     <header class="border-b border-slate-800 bg-slate-950 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-xl font-bold text-white tracking-wide">Talent Calibration Engine</h1>
-            <p class="text-xs text-slate-400">Live Web-Published Google Sheet Integration & Groq AI Workspace</p>
+            <p class="text-xs text-slate-400">Live Multi-Sheet Google Sheet Connection & Groq AI Workspace</p>
         </div>
         
         <div class="flex flex-wrap items-center gap-3">
@@ -40,7 +40,7 @@
     <main class="p-6 max-w-[1600px] mx-auto space-y-6">
         
         <div id="statusBanner" class="p-4 rounded-lg bg-blue-950/40 border border-blue-800/60 text-blue-300 text-sm flex items-center justify-between">
-            <span id="statusMessage">Initial state: Click 'Sync Live Data' to extract positional sheets from your new published link.</span>
+            <span id="statusMessage">Initial state: Click 'Sync Live Data' to pull data sheets from your live Web Link.</span>
             <span id="timestamp" class="text-xs text-slate-400">Not synced</span>
         </div>
 
@@ -135,8 +135,8 @@
     </main>
 
     <script>
-        // Updated URL string targeting your brand new published spreadsheet asset token
-        const CLEAN_CSV_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTjIMi-osLQjTUoIWI-RDHkzZFqPL1AgZlbv7qZp3B78IcP1i7xeYznxgVX5fcj3q2kTLJlv3JLh1tT/pub?output=csv";
+        // Directly maps data using standard Visualization API paths to bypass CORS web-published restrictions perfectly
+        const SPREADSHEET_ID = "1vTjIMi-osLQjTUoIWI-RDHkzZFqPL1AgZlbv7qZp3B78IcP1i7xeYznxgVX5fcj3q2kTLJlv3JLh1tT";
 
         let parsedData = { employeeMaster: [], projectMetrics: [], selfRatings: [], appraiserRatings: [] };
         let masterMatrix = [];
@@ -155,7 +155,7 @@
             }
         }
 
-        // Clean CSV string parser supporting robust standard parsing patterns
+        // Clean CSV parser supporting standard quotes and commas
         function parseCSV(text) {
             const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
             if (lines.length === 0) return [];
@@ -191,37 +191,28 @@
             return result.map(v => v.replace(/^["']|["']$/g, ''));
         }
 
-        // Pull loops using cross-origin compliant sequential tracking numbers
-        async function fetchSequencedTab(tabIndex, tabLabel) {
-            const url = tabIndex === 0 ? CLEAN_CSV_BASE : `${CLEAN_CSV_BASE}&gid=${tabIndex}`;
-            
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error();
-                const text = await response.text();
-                return parseCSV(text);
-            } catch (e) {
-                // Positional sequence backup array
-                const alternativeGids = [0, 1, 2, 3];
-                const fallbackUrl = `${CLEAN_CSV_BASE}&gid=${alternativeGids[tabIndex] || tabIndex}`;
-                const fallbackResponse = await fetch(fallbackUrl);
-                if (!fallbackResponse.ok) throw new Error(`HTTP network degradation on positional matrix index: ${tabIndex}`);
-                const fallbackText = await fallbackResponse.text();
-                return parseCSV(fallbackText);
-            }
+        // Queries via the secure backend visualization layer, matching explicitly by structural tab names
+        async function fetchSheetByName(sheetName) {
+            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Could not read worksheet: "${sheetName}"`);
+            const csvText = await response.text();
+            return parseCSV(csvText);
         }
 
         async function refreshAllData() {
             const statusMsg = document.getElementById('statusMessage');
-            statusMsg.innerText = "Synchronizing raw dataset layers from the new Google Spreadsheet location...";
+            statusMsg.innerText = "Connecting cleanly to multi-tab data structures using specific name filters...";
             statusMsg.className = "text-yellow-400 font-medium";
 
             try {
-                // Fetch sheets based strictly on their physical sequential alignment
-                const empMaster = await fetchSequencedTab(0, "Employee_Master");
-                const projMetrics = await fetchSequencedTab(1, "Project_Metrics");
-                const selfRate = await fetchSequencedTab(2, "Self_Ratings_Data");
-                const appraiserRate = await fetchSequencedTab(3, "Appraiser_Ratings_Data");
+                // Queries the 4 worksheets reliably regardless of their sorting arrangement
+                const [empMaster, projMetrics, selfRate, appraiserRate] = await Promise.all([
+                    fetchSheetByName("Employee_Master"),
+                    fetchSheetByName("Project_Metrics"),
+                    fetchSheetByName("Self_Ratings_Data"),
+                    fetchSheetByName("Appraiser_Ratings_Data")
+                ]);
 
                 parsedData.employeeMaster = empMaster;
                 parsedData.projectMetrics = projMetrics;
@@ -233,13 +224,13 @@
                 renderTable();
                 buildDistributionChart();
 
-                statusMsg.innerText = "New data source cleanly mapped and processed.";
+                statusMsg.innerText = "All data sets securely synchronized. Live workspace ready.";
                 document.getElementById('statusBanner').className = "p-4 rounded-lg bg-emerald-950/40 border border-emerald-800/60 text-emerald-400 text-sm flex items-center justify-between";
                 document.getElementById('timestamp').innerText = new Date().toLocaleTimeString();
 
             } catch (error) {
                 console.error(error);
-                statusMsg.innerText = `Sync failed: ${error.message}. Confirm the new spreadsheet link is published as 'Entire Document'.`;
+                statusMsg.innerText = `Sync failed: ${error.message}. Ensure your Google Sheet tabs are named exactly: Employee_Master, Project_Metrics, Self_Ratings_Data, and Appraiser_Ratings_Data.`;
                 document.getElementById('statusBanner').className = "p-4 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-400 text-sm flex items-center justify-between";
             }
         }
@@ -249,15 +240,13 @@
                 const empId = emp["Emp ID"] || emp["EmpID"];
                 const project = emp["Project"];
 
-                // Locate structural matches across tables safely
                 const projMetric = parsedData.projectMetrics.find(p => p["Project"] === project) || {};
                 const selfScore = parsedData.selfRatings.find(s => (s["Emp ID"] || s["EmpID"]) === empId) || {};
                 const appraiserScore = parsedData.appraiserRatings.find(a => (a["Emp ID"] || a["EmpID"]) === empId) || {};
 
-                // Handle string headers and convert numeric types cleanly
-                const complexityFactor = parseFloat(projMetric["Project Complexity Factor"] || projMetric["Project Complexity"]) || 1.0;
-                const appraiserWeighted = parseFloat(appraiserScore["Weighted Score"] || appraiserScore["WeightedScore"]) || 0.0;
-                const selfWeighted = parseFloat(selfScore["Weighted Score"] || selfScore["WeightedScore"]) || 0.0;
+                const complexityFactor = parseFloat(projMetric["Project Complexity Factor"]) || 1.0;
+                const appraiserWeighted = parseFloat(appraiserScore["Weighted Score"]) || 0.0;
+                const selfWeighted = parseFloat(selfScore["Weighted Score"]) || 0.0;
 
                 const finalCalculatedScore = parseFloat((appraiserWeighted * complexityFactor).toFixed(3));
 
