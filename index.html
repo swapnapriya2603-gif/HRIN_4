@@ -40,7 +40,7 @@
     <main class="p-6 max-w-[1600px] mx-auto space-y-6">
         
         <div id="statusBanner" class="p-4 rounded-lg bg-blue-950/40 border border-blue-800/60 text-blue-300 text-sm flex items-center justify-between">
-            <span id="statusMessage">Initial state: Click 'Sync Live Data' to fetch and calibrate worksheets.</span>
+            <span id="statusMessage">Initial state: Click 'Sync Live Data' to pull all 5 worksheets directly from the live Web Link.</span>
             <span id="timestamp" class="text-xs text-slate-400">Not synced</span>
         </div>
 
@@ -135,16 +135,8 @@
     </main>
 
     <script>
-        // Target Google Sheet Token Base extracted from your published screenshot
-        const BASE_PUB_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTKoh8d2RaxpwcT9BXtq3bqXQoVQKycqT6MAJ9VEpvqDUQ94JfFYp3QSQJaNucJiAxAOuYm_YZFyzZq/pub?output=csv";
-        
-        // Explicit worksheet index pointers mapping to your tabs
-        const TABS = {
-            employeeMaster: "0",          // Sheet 1
-            projectMetrics: "1598007787",   // Sheet 2 
-            selfRatings: "1351187860",      // Sheet 3
-            appraiserRatings: "349971936"   // Sheet 4
-        };
+        // Use the raw structure to query Google visualization data blocks safely
+        const SPREADSHEET_ID = "1vTKoh8d2RaxpwcT9BXtq3bqXQoVQKycqT6MAJ9VEpvqDUQ94JfFYp3QSQJaNucJiAxAOuYm_YZFyzZq";
 
         let parsedData = { employeeMaster: [], projectMetrics: [], selfRatings: [], appraiserRatings: [] };
         let masterMatrix = [];
@@ -163,45 +155,63 @@
             }
         }
 
-        // CSV String to JS Object Array Parser Utility
+        // Fetches a single sheet using Google's visualization query syntax by string name
+        async function fetchSheetByName(sheetName) {
+            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Could not load sheet tab: "${sheetName}"`);
+            const csvText = await response.text();
+            return parseCSV(csvText);
+        }
+
+        // Clean CSV parser supporting standard quotes and commas
         function parseCSV(text) {
             const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
             if (lines.length === 0) return [];
             
-            // Extract and clean headers
-            const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim());
+            const headers = splitCSVLine(lines[0]);
             
             return lines.slice(1).map(line => {
-                // Handle basic comma separation with potential quotes
-                const values = line.split(',').map(v => v.replace(/^["']|["']$/g, '').trim());
+                const values = splitCSVLine(line);
                 let row = {};
                 headers.forEach((header, index) => {
-                    row[header] = values[index] || null;
+                    row[header] = values[index] !== undefined ? values[index] : null;
                 });
                 return row;
             });
         }
 
-        async function fetchCSVTab(gid) {
-            const url = `${BASE_PUB_URL}&gid=${gid}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Network response error on tab ID: ${gid}`);
-            const text = await response.text();
-            return parseCSV(text);
+        function splitCSVLine(line) {
+            let result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                let char = line[i];
+                if (char === '"' || char === "'") {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result.map(v => v.replace(/^["']|["']$/g, ''));
         }
 
         async function refreshAllData() {
             const statusMsg = document.getElementById('statusMessage');
-            statusMsg.innerText = "Synchronizing live published worksheets directly from Google server pools...";
+            statusMsg.innerText = "Connecting directly to individual data matrices via tab name tags...";
             statusMsg.className = "text-yellow-400 font-medium";
 
             try {
-                // Pull data utilizing official GID layouts
+                // Fetch dynamically using the exact names specified
                 const [empMaster, projMetrics, selfRate, appraiserRate] = await Promise.all([
-                    fetchCSVTab(TABS.employeeMaster),
-                    fetchCSVTab(TABS.projectMetrics),
-                    fetchCSVTab(TABS.selfRatings),
-                    fetchCSVTab(TABS.appraiserRatings)
+                    fetchSheetByName("Employee_Master"),
+                    fetchSheetByName("Project_Metrics"),
+                    fetchSheetByName("Self_Ratings_Data"),
+                    fetchSheetByName("Appraiser_Ratings_Data")
                 ]);
 
                 parsedData.employeeMaster = empMaster;
@@ -220,19 +230,20 @@
 
             } catch (error) {
                 console.error(error);
-                statusMsg.innerText = `Sync failed: ${error.message}. Please double-check spreadsheet publishing status.`;
+                statusMsg.innerText = `Sync failed: ${error.message}. Verify that the Google Sheet tabs are named exactly: Employee_Master, Project_Metrics, Self_Ratings_Data, and Appraiser_Ratings_Data.`;
                 document.getElementById('statusBanner').className = "p-4 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-400 text-sm flex items-center justify-between";
             }
         }
 
         function compileMasterMatrix() {
             masterMatrix = parsedData.employeeMaster.map(emp => {
-                const empId = emp["Emp ID"];
+                // Handle different spacing patterns gracefully
+                const empId = emp["Emp ID"] || emp["EmpID"];
                 const project = emp["Project"];
 
                 const projMetric = parsedData.projectMetrics.find(p => p["Project"] === project) || {};
-                const selfScore = parsedData.selfRatings.find(s => s["Emp ID"] === empId) || {};
-                const appraiserScore = parsedData.appraiserRatings.find(a => a["Emp ID"] === empId) || {};
+                const selfScore = parsedData.selfRatings.find(s => (s["Emp ID"] || s["EmpID"]) === empId) || {};
+                const appraiserScore = parsedData.appraiserRatings.find(a => (a["Emp ID"] || a["EmpID"]) === empId) || {};
 
                 const complexityFactor = parseFloat(projMetric["Project Complexity Factor"]) || 1.0;
                 const appraiserWeighted = parseFloat(appraiserScore["Weighted Score"]) || 0.0;
@@ -364,7 +375,7 @@
                 complexity: m.complexity, final: m.finalScore
             }));
 
-            const systemPrompt = `You are an expert HR Data Scientist and Talent Calibration consultant. You are analyzing data joined across 4 corporate performance worksheets. Final Score = Appraiser Weighted Score * Project Complexity Factor. Speak directly to executive leadership with clear business insight.`;
+            const systemPrompt = `You are an expert HR Data Scientist and Talent Calibration consultant. You are analyzing data joined across corporate performance worksheets. Final Score = Appraiser Weighted Score * Project Complexity Factor. Speak directly to executive leadership with clear business insight.`;
             const userContent = `User Playbook Directive: ${promptInstruction}\n\nCalculated Corporate Dataset (JSON):\n${JSON.stringify(minimizedMatrix)}`;
 
             try {
