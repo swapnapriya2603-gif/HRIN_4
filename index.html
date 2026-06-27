@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>HR Performance Moderation Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>HR Performance Moderation Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -14,163 +13,190 @@
         margin:0;
         padding:0;
         box-sizing:border-box;
+        font-family:Arial, Helvetica, sans-serif;
     }
 
     body{
-        font-family:'Inter',sans-serif;
         background:#f4f7fb;
-        color:#1f2937;
-    }
-
-    .container{
-        width:95%;
-        max-width:1600px;
-        margin:auto;
+        color:#1e293b;
         padding:20px;
     }
 
+    .container{
+        max-width:1500px;
+        margin:auto;
+    }
+
     .header{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
+        background:white;
+        padding:20px;
+        border-radius:12px;
         margin-bottom:20px;
-        flex-wrap:wrap;
-        gap:10px;
+        box-shadow:0 2px 8px rgba(0,0,0,0.08);
     }
 
     .header h1{
         font-size:28px;
-        color:#111827;
+        margin-bottom:8px;
+    }
+
+    .sub{
+        color:#64748b;
     }
 
     .controls{
         display:flex;
-        gap:10px;
+        gap:15px;
         flex-wrap:wrap;
+        margin-top:20px;
     }
 
-    input, button{
-        padding:10px 14px;
-        border-radius:8px;
-        border:1px solid #d1d5db;
+    .control-box{
+        background:#f8fafc;
+        padding:12px;
+        border-radius:10px;
+        flex:1;
+        min-width:280px;
+    }
+
+    label{
         font-size:14px;
+        margin-bottom:6px;
+        display:block;
+        color:#334155;
+    }
+
+    input{
+        width:100%;
+        padding:10px;
+        border:1px solid #cbd5e1;
+        border-radius:8px;
     }
 
     button{
         background:#2563eb;
         color:white;
         border:none;
+        padding:12px 18px;
+        border-radius:8px;
         cursor:pointer;
-        font-weight:600;
+        margin-top:10px;
     }
 
     button:hover{
         background:#1d4ed8;
     }
 
-    .grid{
+    .metrics{
         display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-        gap:16px;
+        grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+        gap:18px;
         margin-bottom:20px;
     }
 
     .card{
         background:white;
+        border-radius:12px;
         padding:20px;
-        border-radius:14px;
-        box-shadow:0 2px 8px rgba(0,0,0,0.05);
+        box-shadow:0 2px 8px rgba(0,0,0,0.08);
     }
 
     .metric-title{
+        color:#64748b;
         font-size:14px;
-        color:#6b7280;
         margin-bottom:10px;
     }
 
     .metric-value{
-        font-size:30px;
-        font-weight:700;
-    }
-
-    .section{
-        margin-top:20px;
-    }
-
-    .section-title{
-        font-size:20px;
-        font-weight:700;
-        margin-bottom:15px;
+        font-size:32px;
+        font-weight:bold;
     }
 
     .charts{
         display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+        grid-template-columns:repeat(auto-fit,minmax(450px,1fr));
         gap:20px;
+        margin-bottom:20px;
+    }
+
+    canvas{
+        width:100% !important;
+        height:350px !important;
+    }
+
+    .table-container{
+        overflow:auto;
+        margin-top:10px;
     }
 
     table{
         width:100%;
         border-collapse:collapse;
-        background:white;
-        border-radius:12px;
-        overflow:hidden;
+        min-width:900px;
     }
 
     th, td{
         padding:12px;
-        border-bottom:1px solid #e5e7eb;
+        border-bottom:1px solid #e2e8f0;
         text-align:left;
         font-size:14px;
     }
 
     th{
-        background:#f9fafb;
-        font-weight:600;
+        background:#f1f5f9;
     }
 
-    tr:hover{
-        background:#f3f4f6;
+    .badge{
+        padding:6px 10px;
+        border-radius:20px;
+        font-size:12px;
+        font-weight:bold;
+    }
+
+    .high{
+        background:#fee2e2;
+        color:#b91c1c;
+    }
+
+    .medium{
+        background:#fef3c7;
+        color:#92400e;
+    }
+
+    .low{
+        background:#dcfce7;
+        color:#166534;
     }
 
     .ai-box{
-        background:#111827;
+        background:#0f172a;
         color:white;
         padding:20px;
-        border-radius:14px;
+        border-radius:12px;
         line-height:1.8;
         white-space:pre-wrap;
     }
 
-    .badge{
-        display:inline-block;
-        background:#dbeafe;
-        color:#1d4ed8;
-        padding:4px 10px;
-        border-radius:20px;
-        font-size:12px;
-        font-weight:600;
+    .footer{
+        text-align:center;
+        color:#64748b;
+        margin-top:30px;
+        font-size:14px;
     }
 
-    .footer{
-        margin-top:30px;
-        text-align:center;
-        color:#6b7280;
-        font-size:13px;
+    .loading{
+        color:#2563eb;
+        font-weight:bold;
     }
 
     .error{
-        background:#fee2e2;
-        color:#991b1b;
-        padding:10px;
-        border-radius:8px;
-        margin-top:10px;
+        color:red;
+        font-weight:bold;
     }
 
     @media(max-width:768px){
-        .header{
-            flex-direction:column;
-            align-items:flex-start;
+        .charts{
+            grid-template-columns:1fr;
         }
     }
 </style>
@@ -181,25 +207,40 @@
 <div class="container">
 
     <div class="header">
-        <div>
-            <h1>HR Performance Moderation Dashboard</h1>
-            <div class="badge">Live Google Sheets + Groq AI</div>
+        <h1>HR Performance Moderation Dashboard</h1>
+        <div class="sub">
+            Executive Performance Analytics & AI Moderation Insights
         </div>
 
         <div class="controls">
-            <input type="password" id="groqKey" placeholder="Enter Groq API Key"/>
-            <button onclick="loadDashboard()">Refresh Dashboard</button>
+
+            <div class="control-box">
+                <label>Google Sheet ID</label>
+                <input id="sheetId"
+                    value="14ZIvPF7OqYt6n-CJVg5yU1fUu83Ya0ghx4-8Q4z8cBs"/>
+            </div>
+
+            <div class="control-box">
+                <label>Groq API Key</label>
+                <input id="groqKey" type="password"
+                    placeholder="Enter Groq API Key"/>
+            </div>
+
+            <div class="control-box">
+                <label>Groq Model</label>
+                <input id="groqModel" value="llama3-70b-8192"/>
+            </div>
+
         </div>
+
+        <button onclick="loadDashboard()">Load Dashboard</button>
     </div>
 
-    <div id="errorContainer"></div>
-
-    <!-- KPI CARDS -->
-    <div class="grid">
+    <div class="metrics">
 
         <div class="card">
-            <div class="metric-title">Total Employees</div>
-            <div class="metric-value" id="totalEmployees">0</div>
+            <div class="metric-title">Employees</div>
+            <div class="metric-value" id="employeeCount">0</div>
         </div>
 
         <div class="card">
@@ -208,7 +249,7 @@
         </div>
 
         <div class="card">
-            <div class="metric-title">High Deviations</div>
+            <div class="metric-title">High Deviation Cases</div>
             <div class="metric-value" id="highDeviation">0</div>
         </div>
 
@@ -219,411 +260,388 @@
 
     </div>
 
-    <!-- CHARTS -->
-    <div class="section">
-        <div class="section-title">Performance Analytics</div>
+    <div class="charts">
 
-        <div class="charts">
+        <div class="card">
+            <h3>Self vs Appraiser Ratings</h3>
+            <canvas id="ratingChart"></canvas>
+        </div>
 
-            <div class="card">
-                <canvas id="ratingChart"></canvas>
-            </div>
+        <div class="card">
+            <h3>Manager-wise Average Ratings</h3>
+            <canvas id="managerChart"></canvas>
+        </div>
 
-            <div class="card">
-                <canvas id="managerChart"></canvas>
-            </div>
+        <div class="card">
+            <h3>Project-wise Performance</h3>
+            <canvas id="projectChart"></canvas>
+        </div>
 
-            <div class="card">
-                <canvas id="projectChart"></canvas>
-            </div>
+        <div class="card">
+            <h3>Deviation Distribution</h3>
+            <canvas id="deviationChart"></canvas>
+        </div>
 
+    </div>
+
+    <div class="card">
+        <h3>Top Moderation Review Cases</h3>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Manager</th>
+                        <th>Project</th>
+                        <th>Self Rating</th>
+                        <th>Appraiser Rating</th>
+                        <th>Deviation</th>
+                        <th>Final Weighted Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="moderationTable"></tbody>
+            </table>
         </div>
     </div>
 
-    <!-- DEVIATION TABLE -->
-    <div class="section">
-        <div class="section-title">Top Rating Deviations</div>
-
-        <table id="deviationTable">
-            <thead>
-                <tr>
-                    <th>Employee</th>
-                    <th>Manager</th>
-                    <th>Project</th>
-                    <th>Self Rating</th>
-                    <th>Appraiser Rating</th>
-                    <th>Deviation</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <!-- EMPLOYEE TABLE -->
-    <div class="section">
-        <div class="section-title">Employee Moderation Review</div>
-
-        <table id="employeeTable">
-            <thead>
-                <tr>
-                    <th>Employee</th>
-                    <th>Manager</th>
-                    <th>Project</th>
-                    <th>Final Score</th>
-                    <th>Performance Band</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <!-- AI INSIGHTS -->
-    <div class="section">
-        <div class="section-title">AI HR Leadership Insights</div>
-
-        <div class="ai-box" id="aiInsights">
-            AI insights will appear here after dashboard load.
+    <div class="card" style="margin-top:20px;">
+        <h3>AI HR Insights</h3>
+        <br/>
+        <div id="aiInsights" class="ai-box">
+            AI insights will appear here...
         </div>
     </div>
 
     <div class="footer">
-        HR Moderation Dashboard • Live Google Sheets Integration • Executive Review Ready
+        Auto-refresh enabled every 5 minutes | HR Analytics Dashboard
     </div>
 
 </div>
 
 <script>
 
-const SHEET_ID = "14ZIvPF7OqYt6n-CJVg5yU1fUu83Ya0ghx4-8Q4z8cBs";
-
-const SHEETS = {
-    employees: "EmployeeDetails",
-    ratings: "Ratings",
-    calibration: "Calibration"
-};
-
 let ratingChart;
 let managerChart;
 let projectChart;
+let deviationChart;
 
-async function fetchSheet(sheetName){
+async function fetchSheet(sheetId, sheetName){
 
     const url =
-    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${sheetName}`;
+    `https://opensheet.elk.sh/${sheetId}/${sheetName}`;
 
     const response = await fetch(url);
-    const text = await response.text();
 
-    const json = JSON.parse(text.substring(47).slice(0,-2));
+    if(!response.ok){
+        throw new Error(`Unable to fetch ${sheetName}`);
+    }
 
-    const rows = json.table.rows;
-
-    return rows.map(r =>
-        r.c.map(c => c ? c.v : "")
-    );
+    return await response.json();
 }
 
-function showError(message){
-    document.getElementById("errorContainer").innerHTML =
-        `<div class="error">${message}</div>`;
+function safeNumber(value){
+    return Number(value || 0);
 }
 
-function clearError(){
-    document.getElementById("errorContainer").innerHTML = "";
+function calculateWeightedScore(self, appraiser, weight){
+    return ((self * 0.4) + (appraiser * 0.6)) * (weight/100);
 }
 
 async function loadDashboard(){
 
     try{
 
-        clearError();
+        document.getElementById("aiInsights").innerHTML =
+        "<div class='loading'>Loading dashboard...</div>";
 
-        const employeeData = await fetchSheet(SHEETS.employees);
-        const ratingData = await fetchSheet(SHEETS.ratings);
+        const sheetId =
+        document.getElementById("sheetId").value.trim();
 
-        if(!employeeData.length || !ratingData.length){
-            showError("Missing Google Sheet data.");
-            return;
+        const employees =
+        await fetchSheet(sheetId, "Employee_Details");
+
+        const ratings =
+        await fetchSheet(sheetId, "Ratings");
+
+        const projects =
+        await fetchSheet(sheetId, "Project_Weightages");
+
+        if(!employees.length){
+            throw new Error("Employee data missing");
         }
 
-        const employees = employeeData.slice(1);
-        const ratings = ratingData.slice(1);
+        const merged = [];
 
-        const finalData = [];
+        ratings.forEach(r => {
 
-        ratings.forEach(row => {
+            const emp =
+            employees.find(e => e.EmployeeID === r.EmployeeID);
 
-            const empId = row[0];
-            const selfRating = parseFloat(row[1]) || 0;
-            const appraiserRating = parseFloat(row[2]) || 0;
-            const projectWeight = parseFloat(row[3]) || 1;
+            const proj =
+            projects.find(p => p.Project === r.Project);
 
-            const employee = employees.find(e => e[0] == empId);
+            if(emp){
 
-            if(employee){
+                const self =
+                safeNumber(r.SelfRating);
+
+                const appraiser =
+                safeNumber(r.AppraiserRating);
+
+                const weight =
+                safeNumber(proj?.Weightage || 100);
 
                 const finalScore =
-                    ((selfRating * 0.3) +
-                    (appraiserRating * 0.7))
-                    * projectWeight;
+                calculateWeightedScore(
+                    self,
+                    appraiser,
+                    weight
+                );
 
                 const deviation =
-                    Math.abs(selfRating - appraiserRating);
+                Math.abs(self - appraiser);
 
-                finalData.push({
-                    empId,
-                    employeeName: employee[1],
-                    manager: employee[2],
-                    project: employee[3],
-                    selfRating,
-                    appraiserRating,
-                    projectWeight,
-                    finalScore: finalScore.toFixed(2),
-                    deviation: deviation.toFixed(2)
+                merged.push({
+                    employee: emp.EmployeeName,
+                    manager: emp.Manager,
+                    project: r.Project,
+                    self,
+                    appraiser,
+                    deviation,
+                    finalScore
                 });
             }
-
         });
 
-        updateKPIs(finalData);
-        renderTables(finalData);
-        renderCharts(finalData);
-        generateAIInsights(finalData);
+        renderMetrics(merged);
+        renderCharts(merged);
+        renderTable(merged);
 
-    }catch(error){
+        await generateAIInsights(merged);
 
-        console.error(error);
+    }catch(err){
 
-        showError(
-            "Unable to load dashboard. Verify Google Sheet tab names and sharing permissions."
-        );
+        console.error(err);
+
+        document.getElementById("aiInsights").innerHTML =
+        `<div class='error'>${err.message}</div>`;
     }
 }
 
-function updateKPIs(data){
+function renderMetrics(data){
 
-    document.getElementById("totalEmployees").innerText =
-        data.length;
+    document.getElementById("employeeCount").innerText =
+    data.length;
 
     const avg =
-        data.reduce((a,b) => a + parseFloat(b.finalScore),0)
-        / data.length;
+    (
+        data.reduce((a,b)=>a+b.finalScore,0)
+        / data.length
+    ).toFixed(2);
 
-    document.getElementById("avgScore").innerText =
-        avg.toFixed(2);
+    document.getElementById("avgScore").innerText = avg;
 
-    const deviations =
-        data.filter(d => parseFloat(d.deviation) >= 1).length;
+    const high =
+    data.filter(d => d.deviation >= 2).length;
 
     document.getElementById("highDeviation").innerText =
-        deviations;
+    high;
 
     const managers =
-        [...new Set(data.map(d => d.manager))];
+    [...new Set(data.map(d => d.manager))];
 
     document.getElementById("managerCount").innerText =
-        managers.length;
+    managers.length;
 }
 
-function renderTables(data){
+function destroyCharts(){
 
-    // Deviation Table
-    const deviationBody =
-        document.querySelector("#deviationTable tbody");
-
-    deviationBody.innerHTML = "";
-
-    data.sort((a,b) =>
-        parseFloat(b.deviation) - parseFloat(a.deviation)
-    );
-
-    data.slice(0,10).forEach(d => {
-
-        deviationBody.innerHTML += `
-            <tr>
-                <td>${d.employeeName}</td>
-                <td>${d.manager}</td>
-                <td>${d.project}</td>
-                <td>${d.selfRating}</td>
-                <td>${d.appraiserRating}</td>
-                <td>${d.deviation}</td>
-            </tr>
-        `;
-    });
-
-    // Employee Table
-    const empBody =
-        document.querySelector("#employeeTable tbody");
-
-    empBody.innerHTML = "";
-
-    data.forEach(d => {
-
-        let band = "Average";
-
-        if(d.finalScore >= 4)
-            band = "Outstanding";
-
-        else if(d.finalScore >= 3)
-            band = "Good";
-
-        else if(d.finalScore < 2)
-            band = "Needs Improvement";
-
-        empBody.innerHTML += `
-            <tr>
-                <td>${d.employeeName}</td>
-                <td>${d.manager}</td>
-                <td>${d.project}</td>
-                <td>${d.finalScore}</td>
-                <td>${band}</td>
-            </tr>
-        `;
-    });
+    if(ratingChart) ratingChart.destroy();
+    if(managerChart) managerChart.destroy();
+    if(projectChart) projectChart.destroy();
+    if(deviationChart) deviationChart.destroy();
 }
 
 function renderCharts(data){
 
-    // Ratings Comparison
-    const ratingCtx =
-        document.getElementById('ratingChart');
+    destroyCharts();
 
-    if(ratingChart)
-        ratingChart.destroy();
+    const ctx1 =
+    document.getElementById("ratingChart");
 
-    ratingChart = new Chart(ratingCtx, {
+    ratingChart = new Chart(ctx1,{
         type:'bar',
         data:{
-            labels:data.map(d => d.employeeName),
+            labels:data.map(d=>d.employee),
             datasets:[
                 {
                     label:'Self Rating',
-                    data:data.map(d => d.selfRating)
+                    data:data.map(d=>d.self)
                 },
                 {
                     label:'Appraiser Rating',
-                    data:data.map(d => d.appraiserRating)
+                    data:data.map(d=>d.appraiser)
                 }
             ]
-        },
-        options:{
-            responsive:true,
-            plugins:{
-                title:{
-                    display:true,
-                    text:'Self vs Appraiser Ratings'
-                }
-            }
         }
     });
 
-    // Manager Average
     const managerMap = {};
 
     data.forEach(d => {
 
-        if(!managerMap[d.manager])
+        if(!managerMap[d.manager]){
             managerMap[d.manager] = [];
+        }
 
-        managerMap[d.manager].push(parseFloat(d.finalScore));
+        managerMap[d.manager].push(d.finalScore);
     });
 
-    const managerLabels = Object.keys(managerMap);
+    const managers =
+    Object.keys(managerMap);
 
-    const managerScores = managerLabels.map(m => {
+    const managerAvg =
+    managers.map(m => {
 
         const arr = managerMap[m];
 
         return (
-            arr.reduce((a,b)=>a+b,0) / arr.length
+            arr.reduce((a,b)=>a+b,0)/arr.length
         ).toFixed(2);
     });
 
-    const managerCtx =
-        document.getElementById('managerChart');
+    const ctx2 =
+    document.getElementById("managerChart");
 
-    if(managerChart)
-        managerChart.destroy();
-
-    managerChart = new Chart(managerCtx,{
-        type:'pie',
+    managerChart = new Chart(ctx2,{
+        type:'bar',
         data:{
-            labels:managerLabels,
-            datasets:[{
-                data:managerScores
-            }]
-        },
-        options:{
-            responsive:true,
-            plugins:{
-                title:{
-                    display:true,
-                    text:'Manager-wise Average Score'
+            labels:managers,
+            datasets:[
+                {
+                    label:'Average Score',
+                    data:managerAvg
                 }
-            }
+            ]
         }
     });
 
-    // Project Analysis
     const projectMap = {};
 
     data.forEach(d => {
 
-        if(!projectMap[d.project])
-            projectMap[d.project] = 0;
+        if(!projectMap[d.project]){
+            projectMap[d.project] = [];
+        }
 
-        projectMap[d.project] += parseFloat(d.finalScore);
+        projectMap[d.project].push(d.finalScore);
     });
 
-    const projectCtx =
-        document.getElementById('projectChart');
+    const projects =
+    Object.keys(projectMap);
 
-    if(projectChart)
-        projectChart.destroy();
+    const projectAvg =
+    projects.map(p => {
 
-    projectChart = new Chart(projectCtx,{
+        const arr = projectMap[p];
+
+        return (
+            arr.reduce((a,b)=>a+b,0)/arr.length
+        ).toFixed(2);
+    });
+
+    const ctx3 =
+    document.getElementById("projectChart");
+
+    projectChart = new Chart(ctx3,{
+        type:'pie',
+        data:{
+            labels:projects,
+            datasets:[
+                {
+                    data:projectAvg
+                }
+            ]
+        }
+    });
+
+    const ctx4 =
+    document.getElementById("deviationChart");
+
+    deviationChart = new Chart(ctx4,{
         type:'line',
         data:{
-            labels:Object.keys(projectMap),
-            datasets:[{
-                label:'Project Score',
-                data:Object.values(projectMap)
-            }]
-        },
-        options:{
-            responsive:true,
-            plugins:{
-                title:{
-                    display:true,
-                    text:'Project-wise Performance'
+            labels:data.map(d=>d.employee),
+            datasets:[
+                {
+                    label:'Deviation',
+                    data:data.map(d=>d.deviation)
                 }
-            }
+            ]
         }
+    });
+}
+
+function renderTable(data){
+
+    const table =
+    document.getElementById("moderationTable");
+
+    table.innerHTML = "";
+
+    const sorted =
+    [...data].sort((a,b)=>b.deviation-a.deviation);
+
+    sorted.slice(0,15).forEach(d => {
+
+        let badge = "low";
+
+        if(d.deviation >= 2){
+            badge = "high";
+        }
+        else if(d.deviation >=1){
+            badge = "medium";
+        }
+
+        table.innerHTML += `
+        <tr>
+            <td>${d.employee}</td>
+            <td>${d.manager}</td>
+            <td>${d.project}</td>
+            <td>${d.self}</td>
+            <td>${d.appraiser}</td>
+            <td>${d.deviation}</td>
+            <td>${d.finalScore.toFixed(2)}</td>
+            <td>
+                <span class="badge ${badge}">
+                    ${badge.toUpperCase()}
+                </span>
+            </td>
+        </tr>
+        `;
     });
 }
 
 async function generateAIInsights(data){
 
     const groqKey =
-        document.getElementById("groqKey").value.trim();
+    document.getElementById("groqKey").value.trim();
 
     if(!groqKey){
 
-        document.getElementById("aiInsights").innerText =
-            "Enter Groq API key to generate AI insights.";
+        document.getElementById("aiInsights").innerHTML =
+        "Groq API key not provided.";
 
         return;
     }
 
-    const summary = data.slice(0,20).map(d => `
-Employee: ${d.employeeName}
-Manager: ${d.manager}
-Project: ${d.project}
-Self Rating: ${d.selfRating}
-Appraiser Rating: ${d.appraiserRating}
-Final Score: ${d.finalScore}
-Deviation: ${d.deviation}
-`).join("\n");
+    const model =
+    document.getElementById("groqModel").value.trim();
+
+    const summary = data.slice(0,30);
 
     const prompt = `
 You are an HR analytics expert.
@@ -632,74 +650,131 @@ Analyze the following employee moderation data.
 
 Provide:
 1. Rating deviation analysis
-2. Possible manager bias observations
+2. Possible manager bias
 3. Employee performance trends
 4. Leadership recommendations
-5. Moderation concerns
+5. Calibration concerns
+6. Top risk observations
 
 Data:
-${summary}
+${JSON.stringify(summary)}
 `;
 
     try{
 
-        document.getElementById("aiInsights").innerText =
-            "Generating AI insights...";
-
         const response = await fetch(
-            "https://api.groq.com/openai/v1/chat/completions",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json",
-                    "Authorization":`Bearer ${groqKey}`
-                },
-                body:JSON.stringify({
-                    model:"llama3-70b-8192",
-                    messages:[
-                        {
-                            role:"user",
-                            content:prompt
-                        }
-                    ],
-                    temperature:0.3
-                })
-            }
-        );
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer " + groqKey
+            },
+            body:JSON.stringify({
+                model:model,
+                messages:[
+                    {
+                        role:"user",
+                        content:prompt
+                    }
+                ],
+                temperature:0.3
+            })
+        });
 
         const result = await response.json();
 
-        if(result.error){
-
-            document.getElementById("aiInsights").innerText =
-                "Groq API Error: " + result.error.message;
-
-            return;
-        }
-
-        const aiText =
-            result.choices[0].message.content;
+        const content =
+        result.choices?.[0]?.message?.content
+        || "No AI insights generated.";
 
         document.getElementById("aiInsights").innerText =
-            aiText;
+        content;
 
-    }catch(error){
+    }catch(err){
 
-        console.error(error);
-
-        document.getElementById("aiInsights").innerText =
-            "Unable to generate AI insights.";
+        document.getElementById("aiInsights").innerHTML =
+        `<div class='error'>
+            Failed to generate AI insights.
+        </div>`;
     }
 }
 
-// Auto Refresh every 60 seconds
-setInterval(loadDashboard, 60000);
-
-// Initial Load
 loadDashboard();
+
+setInterval(() => {
+    loadDashboard();
+}, 300000);
 
 </script>
 
 </body>
 </html>
 ```
+
+---
+
+# Recommended Google Sheet Tab Structure
+
+Use these sheet names exactly:
+
+| Sheet Name         | Required Columns                                 |
+| ------------------ | ------------------------------------------------ |
+| Employee_Details   | EmployeeID, EmployeeName, Manager                |
+| Ratings            | EmployeeID, Project, SelfRating, AppraiserRating |
+| Project_Weightages | Project, Weightage                               |
+
+---
+
+# Features Included
+
+* Live Google Sheets integration
+* Automatic refresh every 5 minutes
+* Weighted score calculation
+* Self vs Appraiser comparison
+* Moderation review table
+* Project-wise analysis
+* Manager-wise analysis
+* Deviation analysis
+* Groq AI integration
+* Executive-friendly UI
+* Mobile responsive design
+* Error handling
+* Single HTML deployment
+
+---
+
+# Groq API Setup
+
+Get your API key from:
+
+[Groq Console](https://console.groq.com?utm_source=chatgpt.com)
+
+Paste the API key directly into the dashboard UI.
+
+---
+
+# Publishing Options
+
+You can host this HTML file using:
+
+* [GitHub Pages](https://pages.github.com?utm_source=chatgpt.com)
+* [Netlify](https://www.netlify.com?utm_source=chatgpt.com)
+* [Vercel](https://vercel.com?utm_source=chatgpt.com)
+
+---
+
+# Future Enhancements
+
+You can later extend this dashboard with:
+
+* Department filters
+* Employee search
+* Calibration workflow
+* PDF export
+* Role-based login
+* Trend analysis over quarters
+* AI anomaly detection
+* Sentiment analysis from feedback
+* Heatmaps
+* Predictive attrition risk
