@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
 <title>HR Performance Moderation Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -13,120 +14,163 @@
         margin:0;
         padding:0;
         box-sizing:border-box;
-        font-family:Arial, sans-serif;
     }
 
     body{
-        background:#f4f6f9;
-        color:#222;
+        font-family:'Inter',sans-serif;
+        background:#f4f7fb;
+        color:#1f2937;
+    }
+
+    .container{
+        width:95%;
+        max-width:1600px;
+        margin:auto;
         padding:20px;
     }
 
     .header{
-        background:white;
-        padding:20px;
-        border-radius:12px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
         margin-bottom:20px;
-        box-shadow:0 2px 10px rgba(0,0,0,0.08);
+        flex-wrap:wrap;
+        gap:10px;
     }
 
     .header h1{
         font-size:28px;
-        color:#1f3b57;
+        color:#111827;
+    }
+
+    .controls{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+
+    input, button{
+        padding:10px 14px;
+        border-radius:8px;
+        border:1px solid #d1d5db;
+        font-size:14px;
+    }
+
+    button{
+        background:#2563eb;
+        color:white;
+        border:none;
+        cursor:pointer;
+        font-weight:600;
+    }
+
+    button:hover{
+        background:#1d4ed8;
     }
 
     .grid{
         display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-        gap:20px;
+        grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+        gap:16px;
         margin-bottom:20px;
     }
 
     .card{
         background:white;
-        border-radius:12px;
         padding:20px;
-        box-shadow:0 2px 10px rgba(0,0,0,0.08);
+        border-radius:14px;
+        box-shadow:0 2px 8px rgba(0,0,0,0.05);
     }
 
-    .metric{
-        font-size:34px;
-        font-weight:bold;
-        margin-top:10px;
-        color:#1f3b57;
+    .metric-title{
+        font-size:14px;
+        color:#6b7280;
+        margin-bottom:10px;
     }
 
-    canvas{
-        width:100% !important;
-        height:350px !important;
+    .metric-value{
+        font-size:30px;
+        font-weight:700;
+    }
+
+    .section{
+        margin-top:20px;
+    }
+
+    .section-title{
+        font-size:20px;
+        font-weight:700;
+        margin-bottom:15px;
+    }
+
+    .charts{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+        gap:20px;
     }
 
     table{
         width:100%;
         border-collapse:collapse;
-        margin-top:15px;
+        background:white;
+        border-radius:12px;
+        overflow:hidden;
     }
 
     th, td{
         padding:12px;
-        border-bottom:1px solid #ddd;
+        border-bottom:1px solid #e5e7eb;
         text-align:left;
         font-size:14px;
     }
 
     th{
-        background:#1f3b57;
-        color:white;
+        background:#f9fafb;
+        font-weight:600;
     }
 
-    .badge{
-        padding:5px 10px;
-        border-radius:20px;
-        color:white;
-        font-size:12px;
-        font-weight:bold;
-    }
-
-    .high{
-        background:#d9534f;
-    }
-
-    .medium{
-        background:#f0ad4e;
-    }
-
-    .low{
-        background:#5cb85c;
+    tr:hover{
+        background:#f3f4f6;
     }
 
     .ai-box{
-        background:#eef6ff;
-        border-left:6px solid #1f3b57;
+        background:#111827;
+        color:white;
         padding:20px;
-        line-height:1.7;
-        border-radius:8px;
+        border-radius:14px;
+        line-height:1.8;
+        white-space:pre-wrap;
+    }
+
+    .badge{
+        display:inline-block;
+        background:#dbeafe;
+        color:#1d4ed8;
+        padding:4px 10px;
+        border-radius:20px;
+        font-size:12px;
+        font-weight:600;
     }
 
     .footer{
-        text-align:center;
         margin-top:30px;
-        color:#777;
+        text-align:center;
+        color:#6b7280;
         font-size:13px;
     }
 
     .error{
-        color:red;
+        background:#fee2e2;
+        color:#991b1b;
+        padding:10px;
+        border-radius:8px;
         margin-top:10px;
-        font-weight:bold;
     }
 
     @media(max-width:768px){
-        .header h1{
-            font-size:22px;
-        }
-
-        canvas{
-            height:280px !important;
+        .header{
+            flex-direction:column;
+            align-items:flex-start;
         }
     }
 </style>
@@ -134,388 +178,473 @@
 
 <body>
 
-<div class="header">
-    <h1>HR Performance Moderation Dashboard</h1>
-    <p>Leadership Review & AI-Based Performance Insights</p>
-</div>
+<div class="container">
 
-<div class="grid">
+    <div class="header">
+        <div>
+            <h1>HR Performance Moderation Dashboard</h1>
+            <div class="badge">Live Google Sheets + Groq AI</div>
+        </div>
 
-    <div class="card">
-        <h3>Total Employees</h3>
-        <div class="metric" id="totalEmployees">0</div>
+        <div class="controls">
+            <input type="password" id="groqKey" placeholder="Enter Groq API Key"/>
+            <button onclick="loadDashboard()">Refresh Dashboard</button>
+        </div>
     </div>
 
-    <div class="card">
-        <h3>Average Rating</h3>
-        <div class="metric" id="avgRating">0</div>
+    <div id="errorContainer"></div>
+
+    <!-- KPI CARDS -->
+    <div class="grid">
+
+        <div class="card">
+            <div class="metric-title">Total Employees</div>
+            <div class="metric-value" id="totalEmployees">0</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Average Final Score</div>
+            <div class="metric-value" id="avgScore">0</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">High Deviations</div>
+            <div class="metric-value" id="highDeviation">0</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Managers Reviewed</div>
+            <div class="metric-value" id="managerCount">0</div>
+        </div>
+
     </div>
 
-    <div class="card">
-        <h3>High Deviation Cases</h3>
-        <div class="metric" id="highDeviation">0</div>
+    <!-- CHARTS -->
+    <div class="section">
+        <div class="section-title">Performance Analytics</div>
+
+        <div class="charts">
+
+            <div class="card">
+                <canvas id="ratingChart"></canvas>
+            </div>
+
+            <div class="card">
+                <canvas id="managerChart"></canvas>
+            </div>
+
+            <div class="card">
+                <canvas id="projectChart"></canvas>
+            </div>
+
+        </div>
     </div>
 
-    <div class="card">
-        <h3>Managers Reviewed</h3>
-        <div class="metric" id="managerCount">0</div>
+    <!-- DEVIATION TABLE -->
+    <div class="section">
+        <div class="section-title">Top Rating Deviations</div>
+
+        <table id="deviationTable">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Manager</th>
+                    <th>Project</th>
+                    <th>Self Rating</th>
+                    <th>Appraiser Rating</th>
+                    <th>Deviation</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 
-</div>
+    <!-- EMPLOYEE TABLE -->
+    <div class="section">
+        <div class="section-title">Employee Moderation Review</div>
 
-<div class="grid">
-
-    <div class="card">
-        <h3>Self vs Appraiser Ratings</h3>
-        <canvas id="ratingChart"></canvas>
+        <table id="employeeTable">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Manager</th>
+                    <th>Project</th>
+                    <th>Final Score</th>
+                    <th>Performance Band</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 
-    <div class="card">
-        <h3>Manager-wise Average Ratings</h3>
-        <canvas id="managerChart"></canvas>
+    <!-- AI INSIGHTS -->
+    <div class="section">
+        <div class="section-title">AI HR Leadership Insights</div>
+
+        <div class="ai-box" id="aiInsights">
+            AI insights will appear here after dashboard load.
+        </div>
     </div>
 
-</div>
-
-<div class="grid">
-
-    <div class="card">
-        <h3>Project-wise Performance</h3>
-        <canvas id="projectChart"></canvas>
+    <div class="footer">
+        HR Moderation Dashboard • Live Google Sheets Integration • Executive Review Ready
     </div>
 
-    <div class="card">
-        <h3>Rating Distribution</h3>
-        <canvas id="distributionChart"></canvas>
-    </div>
-
-</div>
-
-<div class="card">
-    <h3>Top Deviation Cases</h3>
-
-    <table id="deviationTable">
-        <thead>
-            <tr>
-                <th>Employee</th>
-                <th>Manager</th>
-                <th>Self Rating</th>
-                <th>Appraiser Rating</th>
-                <th>Deviation</th>
-                <th>Risk</th>
-            </tr>
-        </thead>
-
-        <tbody></tbody>
-    </table>
-</div>
-
-<div class="card" style="margin-top:20px;">
-    <h3>AI HR Insights</h3>
-
-    <div class="ai-box" id="aiInsights">
-        Loading AI insights...
-    </div>
-</div>
-
-<div class="error" id="errorBox"></div>
-
-<div class="footer">
-    HR Moderation Dashboard | Live Google Sheets + Groq AI
 </div>
 
 <script>
 
-const CONFIG = {
+const SHEET_ID = "14ZIvPF7OqYt6n-CJVg5yU1fUu83Ya0ghx4-8Q4z8cBs";
 
-    EMPLOYEE_SHEET:
-    "https://docs.google.com/spreadsheets/d/14ZIvPF7OqYt6n-CJVg5yU1fUu83Ya0ghx4-8Q4z8cBs/gviz/tq?tqx=out:csv&sheet=EmployeeDetails",
-
-    SELF_SHEET:
-    "https://docs.google.com/spreadsheets/d/14ZIvPF7OqYt6n-CJVg5yU1fUu83Ya0ghx4-8Q4z8cBs/gviz/tq?tqx=out:csv&sheet=SelfRatings",
-
-    APPRAISER_SHEET:
-    "https://docs.google.com/spreadsheets/d/14ZIvPF7OqYt6n-CJVg5yU1fUu83Ya0ghx4-8Q4z8cBs/gviz/tq?tqx=out:csv&sheet=AppraiserRatings",
-
-    PROJECT_SHEET:
-    "https://docs.google.com/spreadsheets/d/14ZIvPF7OqYt6n-CJVg5yU1fUu83Ya0ghx4-8Q4z8cBs/gviz/tq?tqx=out:csv&sheet=Projects",
-
-    GROQ_API_KEY: "PASTE_GROQ_API_KEY",
-
-    REFRESH_INTERVAL: 300000
+const SHEETS = {
+    employees: "EmployeeDetails",
+    ratings: "Ratings",
+    calibration: "Calibration"
 };
 
-async function fetchCSV(url){
+let ratingChart;
+let managerChart;
+let projectChart;
+
+async function fetchSheet(sheetName){
+
+    const url =
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${sheetName}`;
 
     const response = await fetch(url);
-
-    if(!response.ok){
-        throw new Error("Unable to load Google Sheet data");
-    }
-
     const text = await response.text();
 
-    return parseCSV(text);
+    const json = JSON.parse(text.substring(47).slice(0,-2));
+
+    const rows = json.table.rows;
+
+    return rows.map(r =>
+        r.c.map(c => c ? c.v : "")
+    );
 }
 
-function parseCSV(text){
+function showError(message){
+    document.getElementById("errorContainer").innerHTML =
+        `<div class="error">${message}</div>`;
+}
 
-    const rows = text.trim().split("\n");
-
-    const headers = rows[0].split(",");
-
-    return rows.slice(1).map(row => {
-
-        const values = row.split(",");
-
-        let obj = {};
-
-        headers.forEach((h,i)=>{
-            obj[h.trim()] = values[i]?.trim();
-        });
-
-        return obj;
-    });
+function clearError(){
+    document.getElementById("errorContainer").innerHTML = "";
 }
 
 async function loadDashboard(){
 
     try{
 
-        document.getElementById("errorBox").innerHTML = "";
+        clearError();
 
-        const employees = await fetchCSV(CONFIG.EMPLOYEE_SHEET);
-        const selfRatings = await fetchCSV(CONFIG.SELF_SHEET);
-        const appraiserRatings = await fetchCSV(CONFIG.APPRAISER_SHEET);
-        const projects = await fetchCSV(CONFIG.PROJECT_SHEET);
+        const employeeData = await fetchSheet(SHEETS.employees);
+        const ratingData = await fetchSheet(SHEETS.ratings);
 
-        const merged = employees.map(emp=>{
+        if(!employeeData.length || !ratingData.length){
+            showError("Missing Google Sheet data.");
+            return;
+        }
 
-            const self = selfRatings.find(s=>s.EmployeeID === emp.EmployeeID);
-            const app = appraiserRatings.find(a=>a.EmployeeID === emp.EmployeeID);
+        const employees = employeeData.slice(1);
+        const ratings = ratingData.slice(1);
 
-            const selfScore = parseFloat(self?.Rating || 0);
-            const appScore = parseFloat(app?.Rating || 0);
+        const finalData = [];
 
-            const deviation = Math.abs(selfScore - appScore);
+        ratings.forEach(row => {
 
-            return {
-                employee: emp.EmployeeName,
-                manager: emp.Manager,
-                project: emp.Project,
-                selfScore,
-                appScore,
-                deviation
-            };
+            const empId = row[0];
+            const selfRating = parseFloat(row[1]) || 0;
+            const appraiserRating = parseFloat(row[2]) || 0;
+            const projectWeight = parseFloat(row[3]) || 1;
+
+            const employee = employees.find(e => e[0] == empId);
+
+            if(employee){
+
+                const finalScore =
+                    ((selfRating * 0.3) +
+                    (appraiserRating * 0.7))
+                    * projectWeight;
+
+                const deviation =
+                    Math.abs(selfRating - appraiserRating);
+
+                finalData.push({
+                    empId,
+                    employeeName: employee[1],
+                    manager: employee[2],
+                    project: employee[3],
+                    selfRating,
+                    appraiserRating,
+                    projectWeight,
+                    finalScore: finalScore.toFixed(2),
+                    deviation: deviation.toFixed(2)
+                });
+            }
+
         });
 
-        renderMetrics(merged);
-        renderCharts(merged);
-        renderDeviationTable(merged);
-        generateAIInsights(merged);
+        updateKPIs(finalData);
+        renderTables(finalData);
+        renderCharts(finalData);
+        generateAIInsights(finalData);
 
-    }catch(err){
+    }catch(error){
 
-        console.error(err);
+        console.error(error);
 
-        document.getElementById("errorBox").innerHTML =
-            "Error loading dashboard data. Verify Google Sheet URLs and sheet names.";
+        showError(
+            "Unable to load dashboard. Verify Google Sheet tab names and sharing permissions."
+        );
     }
 }
 
-function renderMetrics(data){
+function updateKPIs(data){
 
-    document.getElementById("totalEmployees").innerText = data.length;
+    document.getElementById("totalEmployees").innerText =
+        data.length;
 
     const avg =
-        (data.reduce((a,b)=>a+b.appScore,0)/data.length).toFixed(2);
+        data.reduce((a,b) => a + parseFloat(b.finalScore),0)
+        / data.length;
 
-    document.getElementById("avgRating").innerText = avg;
+    document.getElementById("avgScore").innerText =
+        avg.toFixed(2);
 
-    const highDev = data.filter(d=>d.deviation >= 2).length;
+    const deviations =
+        data.filter(d => parseFloat(d.deviation) >= 1).length;
 
-    document.getElementById("highDeviation").innerText = highDev;
+    document.getElementById("highDeviation").innerText =
+        deviations;
 
-    const managers = [...new Set(data.map(d=>d.manager))];
+    const managers =
+        [...new Set(data.map(d => d.manager))];
 
-    document.getElementById("managerCount").innerText = managers.length;
+    document.getElementById("managerCount").innerText =
+        managers.length;
 }
 
-function renderCharts(data){
+function renderTables(data){
 
-    const labels = data.map(d=>d.employee);
-
-    const selfScores = data.map(d=>d.selfScore);
-    const appScores = data.map(d=>d.appScore);
-
-    new Chart(document.getElementById("ratingChart"),{
-        type:"bar",
-        data:{
-            labels,
-            datasets:[
-                {
-                    label:"Self Rating",
-                    data:selfScores
-                },
-                {
-                    label:"Appraiser Rating",
-                    data:appScores
-                }
-            ]
-        }
-    });
-
-    const managerMap = {};
-
-    data.forEach(d=>{
-
-        if(!managerMap[d.manager]){
-            managerMap[d.manager] = [];
-        }
-
-        managerMap[d.manager].push(d.appScore);
-    });
-
-    const managerLabels = Object.keys(managerMap);
-
-    const managerAvg =
-        managerLabels.map(m=>{
-
-            const arr = managerMap[m];
-
-            return arr.reduce((a,b)=>a+b,0)/arr.length;
-        });
-
-    new Chart(document.getElementById("managerChart"),{
-        type:"bar",
-        data:{
-            labels:managerLabels,
-            datasets:[
-                {
-                    label:"Average Rating",
-                    data:managerAvg
-                }
-            ]
-        }
-    });
-
-    const projectMap = {};
-
-    data.forEach(d=>{
-
-        if(!projectMap[d.project]){
-            projectMap[d.project] = [];
-        }
-
-        projectMap[d.project].push(d.appScore);
-    });
-
-    const projectLabels = Object.keys(projectMap);
-
-    const projectAvg =
-        projectLabels.map(p=>{
-
-            const arr = projectMap[p];
-
-            return arr.reduce((a,b)=>a+b,0)/arr.length;
-        });
-
-    new Chart(document.getElementById("projectChart"),{
-        type:"line",
-        data:{
-            labels:projectLabels,
-            datasets:[
-                {
-                    label:"Project Performance",
-                    data:projectAvg
-                }
-            ]
-        }
-    });
-
-    new Chart(document.getElementById("distributionChart"),{
-        type:"pie",
-        data:{
-            labels:["1","2","3","4","5"],
-            datasets:[{
-                data:[
-                    data.filter(d=>d.appScore==1).length,
-                    data.filter(d=>d.appScore==2).length,
-                    data.filter(d=>d.appScore==3).length,
-                    data.filter(d=>d.appScore==4).length,
-                    data.filter(d=>d.appScore==5).length
-                ]
-            }]
-        }
-    });
-}
-
-function renderDeviationTable(data){
-
-    const tbody =
+    // Deviation Table
+    const deviationBody =
         document.querySelector("#deviationTable tbody");
 
-    tbody.innerHTML = "";
+    deviationBody.innerHTML = "";
 
-    data.sort((a,b)=>b.deviation-a.deviation);
+    data.sort((a,b) =>
+        parseFloat(b.deviation) - parseFloat(a.deviation)
+    );
 
-    data.slice(0,10).forEach(d=>{
+    data.slice(0,10).forEach(d => {
 
-        let risk = "low";
-
-        if(d.deviation >= 2){
-            risk = "high";
-        }
-        else if(d.deviation >= 1){
-            risk = "medium";
-        }
-
-        tbody.innerHTML += `
+        deviationBody.innerHTML += `
             <tr>
-                <td>${d.employee}</td>
+                <td>${d.employeeName}</td>
                 <td>${d.manager}</td>
-                <td>${d.selfScore}</td>
-                <td>${d.appScore}</td>
+                <td>${d.project}</td>
+                <td>${d.selfRating}</td>
+                <td>${d.appraiserRating}</td>
                 <td>${d.deviation}</td>
-                <td>
-                    <span class="badge ${risk}">
-                        ${risk.toUpperCase()}
-                    </span>
-                </td>
+            </tr>
+        `;
+    });
+
+    // Employee Table
+    const empBody =
+        document.querySelector("#employeeTable tbody");
+
+    empBody.innerHTML = "";
+
+    data.forEach(d => {
+
+        let band = "Average";
+
+        if(d.finalScore >= 4)
+            band = "Outstanding";
+
+        else if(d.finalScore >= 3)
+            band = "Good";
+
+        else if(d.finalScore < 2)
+            band = "Needs Improvement";
+
+        empBody.innerHTML += `
+            <tr>
+                <td>${d.employeeName}</td>
+                <td>${d.manager}</td>
+                <td>${d.project}</td>
+                <td>${d.finalScore}</td>
+                <td>${band}</td>
             </tr>
         `;
     });
 }
 
+function renderCharts(data){
+
+    // Ratings Comparison
+    const ratingCtx =
+        document.getElementById('ratingChart');
+
+    if(ratingChart)
+        ratingChart.destroy();
+
+    ratingChart = new Chart(ratingCtx, {
+        type:'bar',
+        data:{
+            labels:data.map(d => d.employeeName),
+            datasets:[
+                {
+                    label:'Self Rating',
+                    data:data.map(d => d.selfRating)
+                },
+                {
+                    label:'Appraiser Rating',
+                    data:data.map(d => d.appraiserRating)
+                }
+            ]
+        },
+        options:{
+            responsive:true,
+            plugins:{
+                title:{
+                    display:true,
+                    text:'Self vs Appraiser Ratings'
+                }
+            }
+        }
+    });
+
+    // Manager Average
+    const managerMap = {};
+
+    data.forEach(d => {
+
+        if(!managerMap[d.manager])
+            managerMap[d.manager] = [];
+
+        managerMap[d.manager].push(parseFloat(d.finalScore));
+    });
+
+    const managerLabels = Object.keys(managerMap);
+
+    const managerScores = managerLabels.map(m => {
+
+        const arr = managerMap[m];
+
+        return (
+            arr.reduce((a,b)=>a+b,0) / arr.length
+        ).toFixed(2);
+    });
+
+    const managerCtx =
+        document.getElementById('managerChart');
+
+    if(managerChart)
+        managerChart.destroy();
+
+    managerChart = new Chart(managerCtx,{
+        type:'pie',
+        data:{
+            labels:managerLabels,
+            datasets:[{
+                data:managerScores
+            }]
+        },
+        options:{
+            responsive:true,
+            plugins:{
+                title:{
+                    display:true,
+                    text:'Manager-wise Average Score'
+                }
+            }
+        }
+    });
+
+    // Project Analysis
+    const projectMap = {};
+
+    data.forEach(d => {
+
+        if(!projectMap[d.project])
+            projectMap[d.project] = 0;
+
+        projectMap[d.project] += parseFloat(d.finalScore);
+    });
+
+    const projectCtx =
+        document.getElementById('projectChart');
+
+    if(projectChart)
+        projectChart.destroy();
+
+    projectChart = new Chart(projectCtx,{
+        type:'line',
+        data:{
+            labels:Object.keys(projectMap),
+            datasets:[{
+                label:'Project Score',
+                data:Object.values(projectMap)
+            }]
+        },
+        options:{
+            responsive:true,
+            plugins:{
+                title:{
+                    display:true,
+                    text:'Project-wise Performance'
+                }
+            }
+        }
+    });
+}
+
 async function generateAIInsights(data){
 
-    try{
+    const groqKey =
+        document.getElementById("groqKey").value.trim();
 
-        const summary = data.slice(0,20).map(d=>`
-Employee: ${d.employee}
+    if(!groqKey){
+
+        document.getElementById("aiInsights").innerText =
+            "Enter Groq API key to generate AI insights.";
+
+        return;
+    }
+
+    const summary = data.slice(0,20).map(d => `
+Employee: ${d.employeeName}
 Manager: ${d.manager}
-Self: ${d.selfScore}
-Appraiser: ${d.appScore}
-Deviation: ${d.deviation}
 Project: ${d.project}
-        `).join("\n");
+Self Rating: ${d.selfRating}
+Appraiser Rating: ${d.appraiserRating}
+Final Score: ${d.finalScore}
+Deviation: ${d.deviation}
+`).join("\n");
 
-        const prompt = `
-You are an HR Analytics Expert.
+    const prompt = `
+You are an HR analytics expert.
 
-Analyze this employee moderation data and provide:
+Analyze the following employee moderation data.
 
-1. Manager bias observations
-2. High deviation concerns
-3. Employee trend observations
-4. Calibration recommendations
-5. Leadership recommendations
+Provide:
+1. Rating deviation analysis
+2. Possible manager bias observations
+3. Employee performance trends
+4. Leadership recommendations
+5. Moderation concerns
 
 Data:
 ${summary}
+`;
 
-Keep response concise and executive-friendly.
-        `;
+    try{
+
+        document.getElementById("aiInsights").innerText =
+            "Generating AI insights...";
 
         const response = await fetch(
             "https://api.groq.com/openai/v1/chat/completions",
@@ -523,9 +652,8 @@ Keep response concise and executive-friendly.
                 method:"POST",
                 headers:{
                     "Content-Type":"application/json",
-                    "Authorization":"Bearer " + CONFIG.GROQ_API_KEY
+                    "Authorization":`Bearer ${groqKey}`
                 },
-
                 body:JSON.stringify({
                     model:"llama3-70b-8192",
                     messages:[
@@ -533,32 +661,42 @@ Keep response concise and executive-friendly.
                             role:"user",
                             content:prompt
                         }
-                    ]
+                    ],
+                    temperature:0.3
                 })
             }
         );
 
         const result = await response.json();
 
-        const insight =
-            result.choices?.[0]?.message?.content ||
-            "No insights generated.";
+        if(result.error){
 
-        document.getElementById("aiInsights").innerHTML =
-            insight.replace(/\n/g,"<br>");
+            document.getElementById("aiInsights").innerText =
+                "Groq API Error: " + result.error.message;
 
-    }catch(err){
+            return;
+        }
 
-        console.error(err);
+        const aiText =
+            result.choices[0].message.content;
 
-        document.getElementById("aiInsights").innerHTML =
-            "AI insights unavailable. Verify Groq API configuration.";
+        document.getElementById("aiInsights").innerText =
+            aiText;
+
+    }catch(error){
+
+        console.error(error);
+
+        document.getElementById("aiInsights").innerText =
+            "Unable to generate AI insights.";
     }
 }
 
-loadDashboard();
+// Auto Refresh every 60 seconds
+setInterval(loadDashboard, 60000);
 
-setInterval(loadDashboard, CONFIG.REFRESH_INTERVAL);
+// Initial Load
+loadDashboard();
 
 </script>
 
